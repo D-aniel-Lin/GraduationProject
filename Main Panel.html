@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>车辆故障统计与预警机制的研究</title>
+</head>
+<style>
+    *{margin:0;padding:0;border:none}
+    body{background-color: #ccc}
+    .title{height:150px;width:100%;background-color:#aaa;line-height:150px;text-align:center;font-size:30px;color:#fff}
+    .content{margin:0 auto;width:100%;color:black;font-size:30px;z-index:1;overflow:hidden}
+    .content .btn{margin:150px 124px;height:150px;width:200px;background:#fff;font:48px/72px '微软雅黑';z-index:2;border-radius:30px;color:red}
+    .content button:hover{cursor:pointer}
+    .content p{font:40px/80px '宋体';font-weight:bold;height:80px;margin:0 auto;;width:500px}
+    .content .left{width:450px;margin:0 25px;float:left}
+    .content .right{width:797px;margin:20px 25px;background-color:#fff;overflow:hidden;height:500px;float:left}
+    .content .text{
+        width:200px;height:40px;margin:0 20px;font:20px/30px '微软雅黑';
+        border-radius:10px;vertical-align: text-top; padding:0 10px;}
+    .content .btn-search{display:block;margin:10px auto;height:100px;width:180px;background:#fff;font:36px/54px '微软雅黑';z-index:2;border-radius:20px;color:red}
+    #right .right-content{margin:10px 30px}
+    #right h2{font-family:'微软雅黑';width:200px;text-align:center;margin:10px auto;font-weight:normal}
+    #right .right-content li{list-style:none;font:30px/50px 'Helvetica';margin:10px auto;width:400px;text-align:center;}
+    .content .bottom{width:1320px;margin:0 auto;overflow:hidden}
+    .content .bottom li{width:310px;height:50px; margin:10px 10px;list-style: none;float:left;}
+    .content .top .btn-search{margin:10px 25px;float:left;}
+    .content .bottom li p{display: inline-block;width:50px;font:20px/50px '微软雅黑';}
+    .content .bottom li input{height:30px;vertical-align: middle;border-radius: 10px;margin-left:30px;text-indent:2em}
+</style>
+<body>
+    <div class="title"><h1>车辆故障统计与预警机制的研究</h1></div>
+    <div class="content">
+        <button class="btn"  onclick="warn()">预警</button><!--
+        --><button class="btn"  onclick='$contentShow(1)'>统计</button><!--
+        --><button class="btn"  onclick='$contentShow(2)'>登记</button>
+    </div>
+    <div class="content">
+        <div class="left">
+            <p>
+                <label for="">请输入车型
+                    <select class='text' name="statistic" id="statistic">
+                        <option value="VW Kafer">VW Kafer</option>
+                        <option value="Tesla Model 3">Tesla Model 3</option>
+                    </select>
+                </label>
+            </p>
+            <button class="btn-search"  onclick='statistic()'>统计</button>
+        </div>
+        <div class="right" id="right">
+            <h2>统计结果</h2>
+            <div class="right-content">
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="top">
+            <p><label for="">请输入编号<input class='text' type="text" /></label></p>
+            <div style="width:500px;margin:0 auto">
+                <button class="btn-search"  onclick='savedata()'>编辑</button>
+                <button class="btn-search"  onclick='newdata()'>新建</button>
+            </div>
+        </div>
+        <div class="bottom" style="display:none">
+            <ul>
+                <li><p>编号</p>  <input type="text" name="" /></li>
+                <li><p>姓名</p>  <input type="text" name="" /></li>
+                <li><p>日期</p>  <input type="text" name="" /></li>
+                <li><p>type</p>  <input type="text" name="" /></li>
+                <li><p>email</p>  <input type="text" name="" /></li>
+                <li><p>A1</p>  <input type="text" name="" /></li>
+                <li><p>A2</p>  <input type="text" name="" /></li>
+                <li><p>A3</p>  <input type="text" name="" /></li>
+                <li><p>A4</p>  <input type="text" name="" /></li>
+                <li><p>A5</p>  <input type="text" name="" /></li>
+                <li><p>A6</p>  <input type="text" name="" /></li>
+                <li><p>A7</p>  <input type="text" name="" /></li>
+            </ul>
+            <button class="btn-search"  id='newData' style="display:none" onclick="NewData()">新建</button>
+            <button class="btn-search"  id='saveData' style="display:none" onclick="NewData()">保存</button>
+        </div>
+    </div>
+</body>
+<script src="../jquery-1.9.1/jquery.js"></script>
+<script>
+var data = {
+    '0000001':
+    {
+        'name':'钱一',
+        'date':'1999-11-11',
+        'type':'1999 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'132000030078F00223',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000002':
+    {
+        'name':'孙二',
+        'date':'2000-11-11',
+        'type':'2000 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'142016041014F00012',
+        'A2':'18',
+        'A3':'13',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000003':
+    {
+        'name':'张三',
+        'date':'2001-11-11',
+        'type':'2001 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'132016041014F00110',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000004':
+    {
+        'name':'李四',
+        'date':'2002-11-11',
+        'type':'2002 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'13',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000005':
+    {
+        'name':'王五',
+        'date':'2003-11-11',
+        'type':'2003 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'13',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000006':
+    {
+        'name':'赵六',
+        'date':'2004-11-11',
+        'type':'2004 VW Kafer 180TSI',
+        'email':'linlignjie9408@1163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'13',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000007':
+    {
+        'name':'吴七',
+        'date':'2005-11-11',
+        'type':'2005 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'13',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000008':
+    {
+        'name':'章八',
+        'date':'2006-11-11',
+        'type':'2006 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'13',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000009':
+    {
+        'name':'郑九',
+        'date':'2007-11-11',
+        'type':'2007 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'13',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    },
+    '0000010':
+    {
+        'name':'陈十',
+        'date':'2008-11-11',
+        'type':'2008 VW Kafer 180TSI',
+        'email':'linlignjie9408@163.com',
+        'A1':'14',
+        'A2':'18',
+        'A3':'13',
+        'A4':'16',
+        'A5':'15',
+        'A6':'14',
+        'A7':'17'
+    }
+};
+var inPut = new Array(12);
+var A = new Array(7);
+var iDate = new Date;
+$contentShow();
+function warn(){
+var i=1;
+var carDate = new Date;
+var warning = '';
+var myDate = new Date;
+var life = 1;
+for(var item in data){
+    for(var item2 in data[item]){
+        if(i>=5 ) {
+            life = A[i-5];
+            if (data[item][item2].length == 2) {
+                /*life =data[item][item2];*/
+                carDate = new Date(data[item].date);
+            }else{
+                /*life = data[item][item2].substr(0,2);*/
+                carDate = new Date(data[item][item2].substr(2,4) + '-' + data[item][item2].substr(6,2));
+            }
+            if (Math.round((myDate - carDate) / 1000 / 60 / 60 / 24 / 365) >= life) {
+                warning += data[item].name + '：' + item2 + '    '
+            }
+        }
+        i++;
+    }
+    i=1;
+    if(warning!=''){
+        alert(warning);
+    }
+    warning = '';
+}
+}
+function $contentShow(ele){
+var content = document.getElementsByClassName('content');
+var i;
+if(ele == undefined){
+    for(i=1;i<content.length;i++){
+        content[i].style.display='none';
+    }
+}else{
+    for(i=0;i<content.length;i++){
+
+        content[i].style.display='none';
+    }
+    content[ele].style.display='block'
+}
+}
+function JsonLength(Json) {
+var len = 0;
+for (var item in Json)
+{
+    len++;
+}
+return len;
+}
+function preSta(){
+    A = new Array(7);
+    for(var j=0;j< A.length;j++){
+        A[j]=0;
+    }
+    var option =$('#statistic option:selected').text();
+    var i=1;
+    var Reg =eval('/'+option+'/i');
+    for(var item in data){console.log(item)
+        if(Reg.test(data[item].type)){
+            for(var item2 in data[item]){console.log(item2)
+                if(i>4){
+                    if(data[item][item2].length>2){
+                        A[i-5]+=Number(data[item][item2].substr(2,4))-Number(data[item].date.substr(0,4));
+                    }else{
+                        A[i-5]+=Number(data[item][item2]);
+                    }
+                }
+                i++;
+            }
+            i=1;
+        }
+    }
+    for(i=0;i< A.length;i++){
+        A[i]=Math.round(A[i]/JsonLength(data))
+    }
+}
+preSta();
+function statistic(){
+    console.log(A);
+    $('#right .right-content').html('<ul>' +
+    '<li>'+'A1 Mean Life:'+A[0]+'Years'+'</li>' +
+    '<li>'+'A2 Mean Life:'+A[1]+'Years'+'</li>' +
+    '<li>'+'A3 Mean Life:'+A[2]+'Years'+'</li>' +
+    '<li>'+'A4 Mean Life:'+A[3]+'Years'+'</li>' +
+    '<li>'+'A5 Mean Life:'+A[4]+'Years'+'</li>' +
+    '<li>'+'A6 Mean Life:'+A[5]+'Years'+'</li>' +
+    '<li>'+'A7 Mean Life:'+A[6]+'Years'+'</li></ul>')
+}
+function newdata(){
+    var zero =''
+    $('.bottom').show();
+    $('.top p').hide();
+    $('.bottom #saveData').hide();
+    $('.bottom #newData').show();
+    for(var i=0;i<inPut.length;i++){
+        inPut[i]=$('.bottom li:eq(' + i + ') input');
+    }
+    var jsonLen = JsonLength(data);
+    var numlen = Math.ceil(Math.pow(jsonLen+1,1/10));
+    for(i=numlen;i<7;i++){
+       zero +='0'
+    }
+    inPut[0].val(zero+(jsonLen+1));
+    inPut[2].val(iDate.getFullYear() + '-' + (iDate.getMonth()+1) + '-' + iDate.getDate());
+    inPut[3].val(iDate.getFullYear() + 'VW Kafer 180TSI');
+    inPut[4].val('linlignjie9408@163.com');
+    for(i=5;i<inPut.length;i++){
+        inPut[i].val(A[i-5])
+    }
+}
+function savedata(){
+    $('.bottom').show();
+    $('.top p').hide();
+    $('.bottom #newData').hide();
+    $('.bottom #saveData').show();
+    for(var i=0;i<12;i++){
+        inPut[i]=$('.bottom li:eq(' + i + ') input');
+    }
+    for(var item in data){
+        i=1;
+        if (item == $('.top p label input').val()){
+            inPut[0].val(item);
+            for(var item2 in data[item]){
+                inPut[i].val(data[item][item2]);
+                i++;
+            }
+        }
+    }
+}
+function NewData(){
+    var liP = new Array(12);
+    for(var i=0;i<inPut.length;i++){
+        inPut[i]=$('.bottom li:eq(' + i + ') input');
+        liP[i] = $('.bottom li:eq(' + i + ') p');
+    }
+    data[inPut[0].val()]={};
+/*        data[inPut[0].val()][liP[1].text()]=inPut[1].val();
+    data[inPut[0].val()][liP[2].text()]=inPut[2].val();
+    data[inPut[0].val()][liP[3].text()]=inPut[3].val();
+    data[inPut[0].val()][liP[4].text()]=inPut[4].val();*/
+    for(i=1;i<inPut.length;i++){
+        data[inPut[0].val()][liP[i].text()]=inPut[i].val()
+    }
+    console.log(data)
+}
+</script>
+</html>
+<!---->
